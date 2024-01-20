@@ -2,6 +2,8 @@
 
 The plugin reads the values of variables and, based on the data specified in the settings, creates a table in the workspace with additional data.
 
+To use the plugin after cloning, you can connect it in development mode. The collected current version is located in the dist directory
+
 ### Install dependencies
 
 ```bash
