@@ -1,0 +1,20 @@
+{
+  "name": "token-table-viewer",
+  "id": "1330274562463370899",
+  "api": "1.0.0",
+  "capabilities": [
+    "inspect"
+  ],
+  "enableProposedApi": false,
+  "editorType": [
+    "dev",
+    "figma"
+  ],
+  "main": "dist/code.js",
+  "ui": "dist/ui.html",
+  "networkAccess": {
+    "allowedDomains": [
+      "none"
+    ]
+  }
+}

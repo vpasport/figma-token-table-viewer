@@ -1,0 +1,12 @@
+**/*.js
+**/*.ts
+**/*.png
+**/*.svg
+**/*.jpg
+**/*.jpeg
+**/*.tsx
+**/*.woff2
+**/*.woff
+**/*.ttf
+
+.env
