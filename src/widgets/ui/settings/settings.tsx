@@ -207,7 +207,7 @@ export const Settings: FC<SettingsProps> = ({
                         variant="ghost"
                         colorScheme={!!markAs[variable.id] ? 'blue' : 'gray'}
                         isActive={!!markAs[variable.id]}
-                        color="gray.200"
+                        color={!!markAs[variable.id] ? undefined : 'gray.200'}
                       >
                         Mark as{' '}
                         {markAs[variable.id] ? markAs[variable.id] : null}

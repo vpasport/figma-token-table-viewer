@@ -1,5 +1,5 @@
 export enum TokenMark {
   New = 'NEW',
-  Update = 'UPDATE',
+  Updated = 'UPDATED',
   Deprecated = 'DEPRECATED',
 }
