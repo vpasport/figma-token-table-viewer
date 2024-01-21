@@ -49,7 +49,7 @@ export const App: FC = () => {
           </Flex>
         )}
       </div>
-      <Footer tokensSettings={tokensSettings} />
+      <Footer tokensSettings={tokensSettings} tokenData={variablesData} />
     </div>
   )
 }

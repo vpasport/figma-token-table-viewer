@@ -26,6 +26,7 @@ export const loadVariablesHandler: MessageEventHandler = () => {
             return {
               name: variableData?.name,
               id: variable,
+              values: variableData.valuesByMode,
             }
           }
 

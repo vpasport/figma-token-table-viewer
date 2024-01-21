@@ -72,7 +72,18 @@ export const drawTableHandler: MessageEventHandler<
       }
     })
 
-    const section = figma.createSection()
+    let section: SectionNode
+
+    if (
+      figma.currentPage.selection.length === 1 &&
+      figma.currentPage.selection[0].type === 'SECTION'
+    ) {
+      section = figma.currentPage.selection[0]
+      section.children.forEach((el) => el.remove())
+    } else {
+      section = figma.createSection()
+    }
+
     section.name = 'Tokens table'
 
     const table = createTable()
