@@ -5,15 +5,34 @@ import type {
   VariablesData,
 } from '@/shared/types/interfaces.types'
 
-import { Button, Flex, IconButton, Tooltip } from '@chakra-ui/react'
+import { useState, useEffect } from 'react'
+import {
+  Button,
+  Flex,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuList,
+  Tooltip,
+} from '@chakra-ui/react'
+
 import { postToPlugin } from '@/shared/events/postEvents'
 import { Events } from '@/shared/events'
 import ReloadIcon from '@/shared/icons/bootstrap-icons/arrow-counterclockwise.svg'
 import DownloadIcon from '@/shared/icons/bootstrap-icons/download.svg'
+import { useEventHandlers } from '@/shared/contexts/event-handlers/event-handlers'
 
 import styles from './footer.module.scss'
 
-export const Footer: FC<FooterProps> = ({ tokensSettings, tokenData }) => {
+export const Footer: FC<FooterProps> = ({
+  tokensSettings,
+  tokenData,
+  serverSettings,
+}) => {
+  const { addHandler } = useEventHandlers()
+
+  const [isSendingToServer, setSendingToServer] = useState<boolean>(false)
+
   const prepareData = (
     tokenData: VariablesData,
     tokensSettings: TokensSettings,
@@ -70,6 +89,41 @@ export const Footer: FC<FooterProps> = ({ tokensSettings, tokenData }) => {
     }
   }
 
+  const onSendToServer = () => {
+    try {
+      if (tokenData && tokensSettings) {
+        const data = prepareData(tokenData, tokensSettings)
+        setSendingToServer(true)
+        postToPlugin({
+          event: Events.SendVariablesToServer,
+          data: {
+            ...serverSettings,
+            body: data,
+          },
+        })
+      }
+    } catch (err) {
+      setSendingToServer(false)
+      postToPlugin({
+        event: Events.Notify,
+        data: { message: err.message, options: { error: true } },
+      })
+    }
+  }
+
+  useEffect(() => {
+    const sendToServerResponseHandler = addHandler(
+      Events.SendVariablesToServerResponse,
+      (data) => {
+        setSendingToServer(false)
+      },
+    )
+
+    return () => {
+      sendToServerResponseHandler.off()
+    }
+  }, [])
+
   return (
     <Flex
       p="4"
@@ -90,16 +144,39 @@ export const Footer: FC<FooterProps> = ({ tokensSettings, tokenData }) => {
         Generate table
       </Button>
       <Flex>
-        <Tooltip label="download data">
-          <IconButton
-            aria-label="reload data"
-            onClick={onDownload}
-            icon={<DownloadIcon color="var(--figma-color-icon-tertiary)" />}
-            size="sm"
-            colorScheme="gray"
-            variant="unstyled"
-          />
-        </Tooltip>
+        <Menu>
+          <Tooltip label="download data">
+            <MenuButton
+              as={IconButton}
+              aria-label="reload data"
+              icon={<DownloadIcon color="var(--figma-color-icon-tertiary)" />}
+              size="sm"
+              colorScheme="gray"
+              variant="unstyled"
+            />
+          </Tooltip>
+          <MenuList display="flex" flexDirection="column" minW="none">
+            <Button
+              justifyContent="flex-start"
+              size="xs"
+              variant="ghost"
+              colorScheme="blue"
+              onClick={onDownload}
+            >
+              Save json file
+            </Button>
+            <Button
+              justifyContent="flex-start"
+              size="xs"
+              variant="ghost"
+              colorScheme="blue"
+              onClick={onSendToServer}
+              isDisabled={isSendingToServer}
+            >
+              Send to server
+            </Button>
+          </MenuList>
+        </Menu>
         <Tooltip label="reload data">
           <IconButton
             aria-label="reload data"

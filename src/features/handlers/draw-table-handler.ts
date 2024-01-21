@@ -42,7 +42,12 @@ export const drawTableHandler: MessageEventHandler<
       name: string
       description: string
       mark: TokenMark | null
-      values: { [mode: string]: string }
+      values: {
+        [mode: string]: {
+          value: string
+          id: string
+        }
+      }
     }[] = []
 
     let isMark = false
@@ -51,11 +56,14 @@ export const drawTableHandler: MessageEventHandler<
       const variable = figma.variables.getVariableById(variableId)
 
       if (variable && !data.hiddenVariables.includes(variable.id)) {
-        const values: { [mode: string]: string } = {}
+        const values: (typeof tableData)[number]['values'] = {}
 
         if (variable.valuesByMode) {
           modes.forEach((mode) => {
-            values[mode.name] = variable.valuesByMode[mode.modeId]?.toString()
+            values[mode.name] = {
+              value: variable.valuesByMode[mode.modeId]?.toString(),
+              id: variable.id,
+            }
           })
         }
 
@@ -91,19 +99,29 @@ export const drawTableHandler: MessageEventHandler<
 
     figma.currentPage.appendChild(section)
 
-    const tableDataArray = [
-      ['Token names', ...modes.map((mode) => mode.name)],
+    const tableDataArray: { name: string; id?: string }[][] = [
+      [
+        { name: 'Token names' },
+        ...modes.map((el) => ({ id: el.modeId, name: el.name })),
+      ],
+
       ...tableData.map((data) => [
-        data.name,
-        ...modes.map((mode) => data.values[mode.name]),
+        { name: data.name },
+        ...modes.map((mode) => ({
+          name: data.values[mode.name].value,
+          id: data.values[mode.name].id,
+        })),
       ]),
     ]
 
     const columns: ReturnType<typeof createTableColumn>[] = []
 
     for (const title of tableDataArray[0]) {
-      const column = createTableColumn()
-      const header = await createTableHeader(title)
+      const column = createTableColumn({
+        collection: collection.id,
+        mode: title.id,
+      })
+      const header = await createTableHeader(title.name)
 
       column.appendChild(header)
 
@@ -113,10 +131,11 @@ export const drawTableHandler: MessageEventHandler<
 
     for (let row = 1; row < tableDataArray.length; row++) {
       for (let col = 0; col < tableDataArray[0].length; col++) {
-        const { cell } = await createTableCell(
-          tableDataArray[row][col],
-          col === 0 ? isMark : false,
-        )
+        const { cell } = await createTableCell({
+          characters: tableDataArray[row][col].name,
+          withMark: col === 0 ? isMark : false,
+          charactersVariable: tableDataArray[row][col].id,
+        })
 
         columns[col].appendChild(cell)
       }

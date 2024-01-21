@@ -19,3 +19,8 @@ export interface TokensSettings {
   hiddenVariables: string[]
   markAs: Record<string, TokenMark>
 }
+
+export interface ServerSettings {
+  url: string
+  headers: Record<string, string>
+}

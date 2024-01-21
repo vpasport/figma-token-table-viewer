@@ -63,10 +63,11 @@ export const createNewBadge = async (mark: TokenMark) => {
   }
 }
 
-export const createTableCell = async (
-  characters: string,
-  withMark: boolean,
-) => {
+export const createTableCell = async (options: {
+  characters: string
+  charactersVariable?: string
+  withMark: boolean
+}) => {
   const cell = figma.createFrame()
   cell.layoutMode = 'HORIZONTAL'
   cell.layoutWrap = 'NO_WRAP'
@@ -74,7 +75,7 @@ export const createTableCell = async (
   cell.layoutSizingVertical = 'HUG'
   cell.minWidth = 260
   cell.name = 'cell'
-  cell.paddingRight = withMark ? 120 : 0
+  cell.paddingRight = options.withMark ? 120 : 0
 
   const content = figma.createFrame()
   content.layoutMode = 'HORIZONTAL'
@@ -87,11 +88,14 @@ export const createTableCell = async (
 
   const text = figma.createText()
   await figma.loadFontAsync(text.fontName as FontName)
-  text.characters = characters
+  if (options.charactersVariable) {
+    text.setBoundVariable('characters', options.charactersVariable)
+  } else {
+    text.characters = options.characters
+  }
   text.fontSize = 14
   text.textAutoResize = 'WIDTH_AND_HEIGHT'
   text.name = 'text'
-
   content.appendChild(text)
   cell.appendChild(content)
 

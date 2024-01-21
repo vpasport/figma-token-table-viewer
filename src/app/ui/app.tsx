@@ -1,5 +1,6 @@
 import type { FC } from 'react'
 import type {
+  ServerSettings,
   TokensSettings,
   VariablesData,
 } from '@/shared/types/interfaces.types'
@@ -22,6 +23,10 @@ export const App: FC = () => {
   const [tokensSettings, setTokensSettings] = useState<TokensSettings | null>(
     null,
   )
+  const [serverSettings, setServerSettings] = useState<ServerSettings>({
+    url: 'http://localhost:3001/test',
+    headers: {},
+  })
 
   useEffect(() => {
     const loadDataResponseHandler = addHandler(
@@ -42,14 +47,23 @@ export const App: FC = () => {
     <div className={styles.app}>
       <div className={styles['app-content']}>
         {variablesData ? (
-          <Settings data={variablesData} updateSettings={setTokensSettings} />
+          <Settings
+            data={variablesData}
+            updateSettings={setTokensSettings}
+            serverSettings={serverSettings}
+            updateServerSettings={setServerSettings}
+          />
         ) : (
           <Flex w="100%" h="100%" justifyContent="center" alignItems="center">
             <Spinner color="var(--figma-color-icon-tertiary)" />
           </Flex>
         )}
       </div>
-      <Footer tokensSettings={tokensSettings} tokenData={variablesData} />
+      <Footer
+        tokensSettings={tokensSettings}
+        tokenData={variablesData}
+        serverSettings={serverSettings}
+      />
     </div>
   )
 }
