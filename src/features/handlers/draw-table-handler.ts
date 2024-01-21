@@ -8,8 +8,17 @@ import {
   createTableHeader,
 } from '@/shared/components/plugin/table-cell'
 import { createTableColumn } from '@/shared/components/plugin/table-column'
+import { TokenMark } from '@/shared/constants/token-marks'
+import { TokensSettings } from '@/shared/types/interfaces.types'
 
-export const drawTableHandler: MessageEventHandler = async ({ data }) => {
+export const drawTableHandler: MessageEventHandler<
+  TokensSettings | null
+> = async ({ data }) => {
+  if (data === null || data.selectedCollection === null) {
+    figma.notify('Проверьте актуальность данных')
+    return
+  }
+
   const collections = figma.variables.getLocalVariableCollections()
 
   if (!collections.map((el) => el.id).includes(data.selectedCollection)) {
@@ -32,9 +41,11 @@ export const drawTableHandler: MessageEventHandler = async ({ data }) => {
     const tableData: {
       name: string
       description: string
-      isNew: boolean
+      mark: TokenMark | null
       values: { [mode: string]: string }
     }[] = []
+
+    let isMark = false
 
     collection.variableIds.forEach((variableId) => {
       const variable = figma.variables.getVariableById(variableId)
@@ -48,11 +59,15 @@ export const drawTableHandler: MessageEventHandler = async ({ data }) => {
           })
         }
 
+        if (data.markAs[variable.id]) {
+          isMark = true
+        }
+
         tableData.push({
           name: variable.name,
           description: variable.description,
           values: values,
-          isNew: data.maskAsNewVariables.includes(variable.id),
+          mark: data.markAs[variable.id] ?? null,
         })
       }
     })
@@ -87,7 +102,10 @@ export const drawTableHandler: MessageEventHandler = async ({ data }) => {
 
     for (let row = 1; row < tableDataArray.length; row++) {
       for (let col = 0; col < tableDataArray[0].length; col++) {
-        const { cell } = await createTableCell(tableDataArray[row][col])
+        const { cell } = await createTableCell(
+          tableDataArray[row][col],
+          col === 0 ? isMark : false,
+        )
 
         columns[col].appendChild(cell)
       }
@@ -111,8 +129,14 @@ export const drawTableHandler: MessageEventHandler = async ({ data }) => {
           divider.x = 0
         }
 
-        if (colIdx === 0 && rowIdx !== 0 && tableData[rowIdx - 1].isNew) {
-          const { newBadge } = await createNewBadge()
+        if (
+          colIdx === 0 &&
+          rowIdx !== 0 &&
+          tableData[rowIdx - 1].mark !== null
+        ) {
+          const { newBadge } = await createNewBadge(
+            tableData[rowIdx - 1].mark as TokenMark,
+          )
           row.appendChild(newBadge)
 
           newBadge.fills = [

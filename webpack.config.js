@@ -1,10 +1,9 @@
-const { resolve } = require('node:path');
+const { resolve } = require('node:path')
 
-const { ProvidePlugin } = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin');
-const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
-
+const { ProvidePlugin } = require('webpack')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin')
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
 
 module.exports = (env, argv) => ({
   mode: argv.mode === 'production' ? 'production' : 'development',
@@ -55,8 +54,14 @@ module.exports = (env, argv) => ({
         ],
       },
 
+      {
+        test: /\.svg$/i,
+        issuer: /\.[jt]sx?$/,
+        use: ['@svgr/webpack'],
+      },
+
       // Allows you to use "<%= require('./file.svg') %>" in your HTML code to get a data URI
-      { test: /\.(png|jpg|gif|webp|svg)$/, loader: 'url-loader' },
+      { test: /\.(png|jpg|gif|webp)$/, loader: 'url-loader' },
     ],
   },
 
@@ -68,7 +73,7 @@ module.exports = (env, argv) => ({
   // Tells Webpack to generate "ui.html" and to inline "ui.ts" into it
   plugins: [
     new ProvidePlugin({
-      "React": "react",
+      React: 'react',
     }),
     new HtmlWebpackPlugin({
       template: './src/app/ui/index.html',
@@ -87,4 +92,4 @@ module.exports = (env, argv) => ({
       }),
     ],
   },
-});
+})

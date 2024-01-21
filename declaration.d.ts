@@ -3,9 +3,21 @@ declare module '*.scss' {
   export default content
 }
 
-interface PluginMessage {
-  event: string
-  data: Record<string, any>
+declare module '*.svg' {
+  const content: any
+  export default content
 }
 
-declare type MessageEventHandler = (message: PluginMessage) => void
+interface PluginMessage<
+  DataType extends Record<string, any> | undefined | null =
+    | Record<string, any>
+    | undefined
+    | null,
+> {
+  event: string
+  data: DataType
+}
+
+declare type MessageEventHandler<
+  DataType extends Record<string, any> | undefined | null = Record<string, any>,
+> = (message: PluginMessage<DataType>) => void

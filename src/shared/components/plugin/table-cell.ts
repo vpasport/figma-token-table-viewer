@@ -1,3 +1,5 @@
+import { TokenMark } from '@/shared/constants/token-marks'
+
 export const createDivider = (): [FrameNode, LineNode] => {
   const cell = figma.createFrame()
   cell.layoutMode = 'HORIZONTAL'
@@ -26,7 +28,7 @@ export const createDivider = (): [FrameNode, LineNode] => {
   return [cell, line]
 }
 
-export const createNewBadge = async () => {
+export const createNewBadge = async (mark: TokenMark) => {
   const newBadge = figma.createFrame()
   newBadge.layoutMode = 'HORIZONTAL'
   newBadge.layoutWrap = 'NO_WRAP'
@@ -39,7 +41,7 @@ export const createNewBadge = async () => {
 
   const newText = figma.createText()
   await figma.loadFontAsync(newText.fontName as FontName)
-  newText.characters = 'NEW'
+  newText.characters = mark
   newText.fontSize = 12
   newText.textAutoResize = 'WIDTH_AND_HEIGHT'
   newText.name = 'badge text'
@@ -61,7 +63,10 @@ export const createNewBadge = async () => {
   }
 }
 
-export const createTableCell = async (characters: string) => {
+export const createTableCell = async (
+  characters: string,
+  withMark: boolean,
+) => {
   const cell = figma.createFrame()
   cell.layoutMode = 'HORIZONTAL'
   cell.layoutWrap = 'NO_WRAP'
@@ -69,7 +74,7 @@ export const createTableCell = async (characters: string) => {
   cell.layoutSizingVertical = 'HUG'
   cell.minWidth = 260
   cell.name = 'cell'
-  cell.paddingRight = 60
+  cell.paddingRight = withMark ? 120 : 0
 
   const content = figma.createFrame()
   content.layoutMode = 'HORIZONTAL'

@@ -1,8 +1,11 @@
 import type { FC } from 'react'
-import type { VariablesData } from '@/shared/types/interfaces.types'
+import type {
+  TokensSettings,
+  VariablesData,
+} from '@/shared/types/interfaces.types'
 
 import { useEffect, useState } from 'react'
-import { Spinner } from '@chakra-ui/react'
+import { Flex, Spinner } from '@chakra-ui/react'
 
 import { Events } from '@/shared/events'
 import { postToPlugin } from '@/shared/events/postEvents'
@@ -10,11 +13,15 @@ import { useEventHandlers } from '@/shared/contexts/event-handlers/event-handler
 import { Settings } from '@/widgets/ui/settings/settings'
 
 import styles from './app.module.scss'
+import { Footer } from '@/widgets/ui/footer/footer'
 
 export const App: FC = () => {
   const { addHandler } = useEventHandlers()
 
   const [variablesData, setVariablesData] = useState<VariablesData | null>(null)
+  const [tokensSettings, setTokensSettings] = useState<TokensSettings | null>(
+    null,
+  )
 
   useEffect(() => {
     const loadDataResponseHandler = addHandler(
@@ -33,7 +40,16 @@ export const App: FC = () => {
 
   return (
     <div className={styles.app}>
-      {variablesData ? <Settings data={variablesData} /> : <Spinner />}
+      <div className={styles['app-content']}>
+        {variablesData ? (
+          <Settings data={variablesData} updateSettings={setTokensSettings} />
+        ) : (
+          <Flex w="100%" h="100%" justifyContent="center" alignItems="center">
+            <Spinner color="var(--figma-color-icon-tertiary)" />
+          </Flex>
+        )}
+      </div>
+      <Footer tokensSettings={tokensSettings} />
     </div>
   )
 }
